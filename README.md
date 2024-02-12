@@ -16,31 +16,31 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-# Initialize NewsAPI client
+Initialize NewsAPI client
 newsapi = NewsApiClient(api_key='YOUR_API_KEY')
 
-# Fetch today's top headlines from NewsAPI
+### Fetch today's top headlines from NewsAPI
 top_headlines = newsapi.get_top_headlines(language='en')
 
-# Extract article content from the top headlines
+### Extract article content from the top headlines
 articles = [article['content'] for article in top_headlines['articles'] if article['content']]
 
-# Filter out articles with empty content
+### Filter out articles with empty content
 articles = [article for article in articles if article]
 
-# Initialize SentenceTransformer model
+### Initialize SentenceTransformer model
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
-# Create embeddings for the articles
+### Create embeddings for the articles
 embeddings = model.encode(articles)
 
-# Cluster the embeddings
+### Cluster the embeddings
 num_clusters = 5  # Adjust as needed
 kmeans = KMeans(n_clusters=num_clusters)
 kmeans.fit(embeddings)
 clusters = kmeans.labels_
 
-# Summarize the clusters
+### Summarize the clusters
 for cluster_idx in range(num_clusters):
     cluster_articles = [articles[i] for i, cluster_label in enumerate(clusters) if cluster_label == cluster_idx]
     centroid_idx = pairwise_distances_argmin_min(kmeans.cluster_centers_[cluster_idx].reshape(1, -1), embeddings)[0][0]
